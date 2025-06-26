@@ -25,6 +25,7 @@ pub struct ChatApp {
     show_save_dialog: bool,
     save_name_input: String,
     lm_client: LMStudioClient,
+    model: String,
 }
 
 impl Default for ChatApp {
@@ -37,6 +38,7 @@ impl Default for ChatApp {
             show_save_dialog: false,
             save_name_input: String::new(),
             lm_client: LMStudioClient::new(),
+            model: "bielik-11b-v2.3-instruct".to_string()
         }
     }
 }
@@ -106,7 +108,6 @@ impl Application for ChatApp {
                     };
                     
                     self.messages.push(user_message);
-                    let input_content = self.input_value.clone();
                     self.input_value.clear();
                     
                     // Przygotuj historię wiadomości dla LM Studio
@@ -118,11 +119,13 @@ impl Application for ChatApp {
                         });
                     }
                     
-                    // Wyślij wiadomość do LM Studio
+                    // Sklonuj potrzebne zmienne przed move
                     let client = self.lm_client.clone();
+                    let model = self.model.clone(); // Sklonuj model zamiast borrowować
+                    
                     return Command::perform(
                         async move {
-                            match client.send_message("local-model", history) {
+                            match client.send_message(&model, history) {
                                 Ok(response) => Ok(response),
                                 Err(e) => Err(format!("Błąd komunikacji z LM Studio: {}", e)),
                             }
