@@ -3,7 +3,7 @@ use serde::{Deserialize, Serialize};
 use std::time::Duration;
 use reqwest::Url;
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 pub struct LMStudioClient {
     client: Client,
 }
